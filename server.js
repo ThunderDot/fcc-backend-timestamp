@@ -9,24 +9,16 @@ var app = express();
 // so that your API is remotely testable by FCC
 var cors = require("cors");
 app.use(cors({ optionSuccessStatus: 200 })); // some legacy browsers choke on 204
-/* app.use(function(req, res, next) {    
-    var origin = req.headers.origin || '*';
-    if(!process.env.XORIG_RESTRICT || origin > -1){
-         console.log(origin, req.body);
-         res.setHeader('Access-Control-Allow-Origin', origin);
-         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    }
-    next();
-  }); */
 
-app.use(function(req, res, next) {
+// check req values and origin
+/*app.use(function(req, res, next) {
   var origin = req.headers.origin;
   if (origin)
     console.log(
       "Origin: " + req.headers.origin + "IP: " + req.connection.remoteAddress
     );
   next();
-});
+});*/
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static("public"));
@@ -38,12 +30,28 @@ app.get("/", function(req, res) {
 
 // your first API endpoint...
 app.get("/api/timestamp/:date_string?", function(req, res) {
-  var timeRaw = new Date(req.params.date_string);
-  if (timeRaw === "Invalid Date") {
-    var result = { unix: null, utc: timeRaw };
+  var param = req.params.date_string;
+  var newTime = new Date(param);
+  var result;
+  var unix1 = new RegExp(/^\d+$/);
+  var textUnix = new Date(parseInt(param));
+  // Empty parameter
+  if (param) {
+    // normal date parameter
+    if (isNaN(newTime)) {
+      if (unix1.test(param) && !isNaN(textUnix)) {
+        result = { unix: parseInt(param), utc: textUnix.toUTCString() };
+      } else {
+        res.status(500).json({"unix": `null`, "utc": `Invalid Date`});
+      }
+    } else {
+      result = { unix: newTime.getTime(), utc: newTime.toUTCString() };
+    }
   } else {
-    var result = { unix: Date.parse(timeRaw), utc: timeRaw.toUTCString() };
+    var timeNow = new Date();
+    result = { unix: timeNow.getTime(), utc: timeNow.toUTCString() };
   }
+  console.log(param, req.body);
   res.json(result);
 });
 
