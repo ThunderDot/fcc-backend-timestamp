@@ -8,6 +8,9 @@
   },
   "dependencies": {
     "express": "^4.16.4",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "fcc-express-bground": "https://github.com/Em-Ant/fcc-express-bground-pkg.git",
     "cors": "^2.8.5"
   },
   "engines": {

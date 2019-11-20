@@ -31,28 +31,24 @@ app.get("/", function(req, res) {
 // your first API endpoint...
 app.get("/api/timestamp/:date_string?", function(req, res) {
   var param = req.params.date_string;
-  var newTime = new Date(param);
-  var result;
-  var unix1 = new RegExp(/^\d+$/);
-  var textUnix = new Date(parseInt(param));
-  // Empty parameter
-  if (param) {
-    // normal date parameter
-    if (isNaN(newTime)) {
-      if (unix1.test(param) && !isNaN(textUnix)) {
-        result = { unix: parseInt(param), utc: textUnix.toUTCString() };
-      } else {
-        res.status(500).json({"unix": `null`, "utc": `Invalid Date`});
-      }
-    } else {
-      result = { unix: newTime.getTime(), utc: newTime.toUTCString() };
-    }
-  } else {
-    var timeNow = new Date();
-    result = { unix: timeNow.getTime(), utc: timeNow.toUTCString() };
-  }
-  console.log(param, req.body);
-  res.json(result);
+
+  var testUnixDate = new RegExp(/^\d+$/g);
+  var testNormalDate = new RegExp(/(^\d{4}[\-\/]\d{2}[\-\/]\d{2}$)()/g);
+
+  var normalDate = new Date(param);
+  var unixDate = new Date(parseInt(param));
+  var dateNow = new Date();
+
+  param
+    ? testNormalDate.test(param)
+      ? res.json({
+          unix: Date.parse(normalDate),
+          utc: normalDate.toUTCString()
+        })
+      : testUnixDate.test(param)
+      ? res.json({ unix: Date.parse(unixDate), utc: unixDate.toUTCString() })
+      : res.json({ unix: Date.parse(unixDate), utc: unixDate.toUTCString() })
+    : res.json({ unix: Date.parse(dateNow), utc: dateNow.toUTCString() });
 });
 
 // listen for requests :)
