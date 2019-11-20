@@ -47,7 +47,7 @@ app.get("/api/timestamp/:date_string?", function(req, res) {
         })
       : testUnixDate.test(param)
       ? res.json({ unix: Date.parse(unixDate), utc: unixDate.toUTCString() })
-      : res.json({ unix: Date.parse(unixDate), utc: unixDate.toUTCString() })
+      : res.json({ error: unixDate.toUTCString() })
     : res.json({ unix: Date.parse(dateNow), utc: dateNow.toUTCString() });
 });
 
