@@ -38,16 +38,19 @@ app.get("/api/timestamp/:date_string?", function(req, res) {
   var normalDate = new Date(param);
   var unixDate = new Date(parseInt(param));
   var dateNow = new Date();
+  var dateError = { error: normalDate.toUTCString()};
 
   param
     ? testNormalDate.test(param)
-      ? res.json({
-          unix: Date.parse(normalDate),
-          utc: normalDate.toUTCString()
-        })
-      : testUnixDate.test(param)
+      ? !isNaN(normalDate)
+        ? res.json({
+            unix: Date.parse(normalDate),
+            utc: normalDate.toUTCString()
+          })
+        : res.json(dateError)
+    : testUnixDate.test(param)
       ? res.json({ unix: Date.parse(unixDate), utc: unixDate.toUTCString() })
-      : res.json({ error: unixDate.toUTCString() })
+      : res.json(dateError)
     : res.json({ unix: Date.parse(dateNow), utc: dateNow.toUTCString() });
 });
 
